@@ -1,0 +1,17 @@
+# torch/torchvision come from the base image (pytorch/pytorch:2.9.1-cuda12.6-cudnn9-runtime)
+# and are intentionally NOT reinstalled here.
+#
+# nnunetv2 version is pinned to match the environment the STU-Net weights were
+# trained with. CONFIRM on the server: `pip show nnunetv2` in the training env,
+# and use that exact version together with that env's STUNetTrainer.py.
+nnunetv2==2.5.1
+monai>=1.5.0
+SimpleITK>=2.3.0
+scikit-image>=0.22.0
+scipy>=1.11.0
+pandas>=2.2.0
+numpy>=1.26.0
+pyradiomics>=3.0.1
+joblib>=1.3.0
+scikit-survival>=0.22.0
+scikit-learn>=1.3.0

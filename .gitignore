@@ -1,0 +1,12 @@
+# Model weights hosted externally / reproducible from configs (see README)
+*.pth
+*.pt
+# Large RSF ensemble (776MB, reproducible via save_final_models_v2.py)
+task23_radiomics/resources/clinical_rfs_model_v2_ensemble.joblib
+# Never commit patient data
+*.nii.gz
+*.csv
+*.xlsx
+__pycache__/
+*.pyc
+.DS_Store

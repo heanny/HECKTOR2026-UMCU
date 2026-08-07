@@ -1,0 +1,29 @@
+{
+  "dl_config": "clinical+CT+PET+hard_T+hard_N",
+  "C": 1.0,
+  "t_rf_prob_cols": [
+    "rf_t_stage_prob_0",
+    "rf_t_stage_prob_1",
+    "rf_t_stage_prob_2",
+    "rf_t_stage_prob_3",
+    "rf_t_stage_prob_4"
+  ],
+  "t_dl_cols": [
+    "T_prob_T1",
+    "T_prob_T2",
+    "T_prob_T3",
+    "T_prob_T4"
+  ],
+  "n_rf_prob_cols": [
+    "rf_n_stage_prob_0",
+    "rf_n_stage_prob_1",
+    "rf_n_stage_prob_2",
+    "rf_n_stage_prob_3"
+  ],
+  "n_dl_cols": [
+    "N_prob_N0",
+    "N_prob_N1",
+    "N_prob_N2",
+    "N_prob_N3"
+  ]
+}
