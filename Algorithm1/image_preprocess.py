@@ -27,10 +27,7 @@ from constants import (
     NATIVE_SPACING, TARGET_SPACING, PAD_TO_SHAPE, CROP_BOX_SIZE,
 )
 
-
-# ═══════════════════════════════════════════════════════════════════════════
 # Stage A — resample + PET-centred crop  (from preprocess_jin.py, verbatim)
-# ═══════════════════════════════════════════════════════════════════════════
 
 def _get_bounding_boxes(ct, pet):
     ct_origin  = np.array(ct.GetOrigin())
@@ -133,10 +130,7 @@ def resample_and_crop(ct_path, pet_path):
     ct_crop, pet_crop = _crop_neck_region(ct_r, pet_r)
     return ct_crop, pet_crop
 
-
-# ═══════════════════════════════════════════════════════════════════════════
 # Stage B — DenseNet 4-channel preprocessing  (from dataset.py, verbatim)
-# ═══════════════════════════════════════════════════════════════════════════
 
 def _pad_to(volume, target_shape):
     spatial = volume.shape[-3:]
