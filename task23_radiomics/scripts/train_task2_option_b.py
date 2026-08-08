@@ -14,7 +14,7 @@ DL_CONFIG = 'clinical+CT+PET+hard_T+hard_N'
 C_VALUE = 1.0
 SEED = 12345
 
-# RF OOF (你们之前生成的LOCO OOF)
+# RF OOF (the LOCO OOF we generated previously)
 oof_t = pd.read_csv(f'{FEAT_DIR}oof_rf_t_stage_v2.csv')
 oof_n = pd.read_csv(f'{FEAT_DIR}oof_rf_n_stage_v2.csv')
 
@@ -23,19 +23,19 @@ df_labels = pd.read_csv(f'{FEAT_DIR}train_dataset.csv')[['PatientID','T_label','
 t_rf_prob_cols = [f'rf_t_stage_prob_{c}' for c in [0,1,2,3,4]]
 n_rf_prob_cols = [f'rf_n_stage_prob_{c}' for c in [0,1,2,3]]
 
-# DL OOF (固定, clinical+CT+PET+hTN)
+# DL OOF (fixed, clinical+CT+PET+hTN)
 dl_oof = pd.read_csv(f'{PRED_DIR}{DL_CONFIG}/oof_predictions.csv')
 t_dl_cols = [f'T_prob_T{c}' for c in DL_T_CLASSES]
 n_dl_cols = [f'N_prob_N{c}' for c in DL_N_CLASSES]
 
-# T stacking训练 (T0排除, DL无T0类别)
+# T-stacking training (T0 excluded, DL has no T0 category)
 mt = oof_t.merge(df_labels[['PatientID','T_label']], on='PatientID', how='inner')
 mt = mt.merge(dl_oof[['PatientID']+t_dl_cols], on='PatientID', how='inner')
 mt = mt.dropna(subset=['T_label']+t_dl_cols)
 mt = mt[mt['T_label'].isin(DL_T_CLASSES)].copy()
 Xt = mt[t_rf_prob_cols + t_dl_cols].values
 yt = mt['T_label'].values.astype(int)
-print(f'T staging stacking训练样本数: {len(mt)}')
+print(f'T staging stacking training sample number: {len(mt)}')
 
 lr_t = LogisticRegression(C=C_VALUE, max_iter=1000, random_state=SEED, class_weight='balanced')
 lr_t.fit(Xt, yt)
@@ -46,12 +46,12 @@ mn = mn.merge(dl_oof[['PatientID']+n_dl_cols], on='PatientID', how='inner')
 mn = mn.dropna(subset=['N_label']+n_dl_cols).copy()
 Xn = mn[n_rf_prob_cols + n_dl_cols].values
 yn = mn['N_label'].values.astype(int)
-print(f'N staging stacking训练样本数: {len(mn)}')
+print(f'N staging stacking training sample number: {len(mn)}')
 
 lr_n = LogisticRegression(C=C_VALUE, max_iter=1000, random_state=SEED, class_weight='balanced')
 lr_n.fit(Xn, yn)
 
-# 保存
+# save
 joblib.dump(lr_t, f'{RES_DIR}task2_optionB_stack_t_model.joblib')
 joblib.dump(lr_n, f'{RES_DIR}task2_optionB_stack_n_model.joblib')
 with open(f'{RES_DIR}task2_optionB_info.json', 'w') as f:
@@ -62,7 +62,7 @@ with open(f'{RES_DIR}task2_optionB_info.json', 'w') as f:
     }, f, indent=2)
 print('已保存: task2_optionB_stack_t_model.joblib / stack_n_model.joblib')
 
-# 快速在CHUV上验证一下数字对不对
+# Quickly verify the numbers on CHUV to see if they are correct.
 df_test_gt = pd.read_csv(f'{FEAT_DIR}test_dataset.csv')
 df_chuv_feat = pd.read_csv(f'{FEAT_DIR}chuv_predicted_mask_features_v2.csv')
 _clin = df_test_gt[['PatientID','Age','Gender_enc','HPV_enc']]
@@ -98,5 +98,5 @@ t_pred = lr_t.predict(Xt_test)
 n_pred = lr_n.predict(Xn_test)
 t_ba = balanced_accuracy_score(df_chuv_lbl['T_label'].astype(int), t_pred)
 n_ba = balanced_accuracy_score(df_chuv_lbl['N_label'].astype(int), n_pred)
-print(f'\n验证: T BA={t_ba:.4f}, N BA={n_ba:.4f}, Mean={((t_ba+n_ba)/2):.4f}')
-print(f'预期(表格里的数字): T=0.514, N=0.726, Mean=0.620')
+print(f'\n Verify on CHUV: T BA={t_ba:.4f}, N BA={n_ba:.4f}, Mean={((t_ba+n_ba)/2):.4f}')
+print(f'Expected (numbers in the table): T=0.514, N=0.726, Mean=0.620')
