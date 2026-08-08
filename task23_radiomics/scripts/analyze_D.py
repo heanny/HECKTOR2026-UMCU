@@ -2,6 +2,7 @@ import pandas as pd, numpy as np
 from itertools import combinations
 from sksurv.metrics import concordance_index_censored
 
+
 base='/nvme/jin/HECKTOR26/task2_3_prediction/results/predictions'
 lab=pd.read_csv('features/oof_clinical_rfs_v2.csv')[['PatientID','Relapse','RFS']]
 rsf=pd.read_csv('features/oof_clinical_rfs_v2.csv')[['PatientID','rf_rfs_risk']].rename(columns={'rf_rfs_risk':'RSF'})
