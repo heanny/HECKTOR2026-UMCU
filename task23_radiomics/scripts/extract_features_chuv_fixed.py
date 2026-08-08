@@ -17,7 +17,7 @@ suv_df = pd.read_csv(SUV_CSV)
 SUV_FACTORS = dict(zip(suv_df['pid'], suv_df['bqml_to_suvbw_factor']))
 
 chuv_ids = sorted(set([f.split('.')[0] for f in os.listdir(PRED_DIR) if f.endswith('.nii.gz')]))
-print(f'CHUV患者数: {len(chuv_ids)}')
+print(f'number of CHUV cases: {len(chuv_ids)}')
 
 settings = {
     'binWidth': 25,
@@ -109,7 +109,7 @@ def extract_one(pid):
         return {'PatientID': pid, 'error': str(e)}
 
 from multiprocessing import Pool
-print('开始提取(预测mask, CHUV, 修复版)...')
+print('Start extraction (predicting mask, CHUV, fixed version)...')
 with Pool(processes=10) as pool:
     results = pool.map(extract_one, chuv_ids)
 
@@ -125,11 +125,11 @@ for region in ['GTVp', 'GTVn']:
     cols_to_zero += [f'{region}_SUVmean', f'{region}_SUVmax', f'{region}_TLG']
     cols_to_zero = [c for c in cols_to_zero if c in df_pred.columns and c != empty_col]
     df_pred.loc[empty_rows, cols_to_zero] = 0.0
-    print(f'{region}: {int(empty_rows.sum())} 个空mask患者, 已对 {len(cols_to_zero)} 个特征列填0')
+    print(f'{region}: {int(empty_rows.sum())} cases with empty mask, filled in with zeros in {len(cols_to_zero)} features')
 
 remaining_nan = df_pred.drop(columns=['error'], errors='ignore').isna().sum().sum()
-print(f'[CHECK] 修复后剩余NaN总数: {remaining_nan}')
+print(f'[CHECK] Total number of NaN remaining after processing: {remaining_nan}')
 
-print(f'完成: {df_pred.shape}')
+print(f'Finished: {df_pred.shape}')
 df_pred.to_csv(OUTPUT, index=False)
-print('[OK] 已保存到', OUTPUT)
+print('[OK] Already saved at', OUTPUT)
