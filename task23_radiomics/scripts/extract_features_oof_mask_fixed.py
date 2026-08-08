@@ -17,7 +17,7 @@ suv_df = pd.read_csv(SUV_CSV)
 SUV_FACTORS = dict(zip(suv_df['pid'], suv_df['bqml_to_suvbw_factor']))
 
 patient_ids = sorted(set([f.split('.')[0] for f in os.listdir(OOF_MASK_DIR) if f.endswith('.nii.gz')]))
-print(f'训练集患者数(OOF mask): {len(patient_ids)}')
+print(f'Number of patients in the training set (OOF mask): {len(patient_ids)}')
 
 settings = {
     'binWidth': 25,
@@ -51,14 +51,14 @@ def extract_one(pid):
             pt_corrected.CopyInformation(pt)
             pt = pt_corrected
 
-        # mask -> CT网格, 无条件resample(不依赖size是否碰巧不同)
+        # mask -> CT mesh, unconditional resampling (independent of whether the sizes happen to be different)
         resampler_mask = sitk.ResampleImageFilter()
         resampler_mask.SetReferenceImage(ct)
         resampler_mask.SetInterpolator(sitk.sitkNearestNeighbor)
         resampler_mask.SetDefaultPixelValue(0)
         pred_mask = resampler_mask.Execute(pred_mask)
 
-        # PT -> CT网格, 无条件resample(修复CHUP-075这类几何不对齐, 用线性插值)
+        # PT -> CT mesh, unconditional resample (to fix geometric misalignment issues like CHUP-075 using linear interpolation)
         resampler_pt = sitk.ResampleImageFilter()
         resampler_pt.SetReferenceImage(ct)
         resampler_pt.SetInterpolator(sitk.sitkLinear)
@@ -119,14 +119,14 @@ def extract_one(pid):
         return {'PatientID': pid, 'error': str(e)}
 
 from multiprocessing import Pool
-print('开始提取(OOF预测mask, 训练集, 修复版)...')
+print('Start extracting (OOF prediction mask, training set, and fixed version)...')
 
 with Pool(processes=15) as pool:
     results = []
     for i, r in enumerate(pool.imap(extract_one, patient_ids)):
         results.append(r)
         if (i+1) % 50 == 0:
-            print(f'  进度: {i+1}/{len(patient_ids)}')
+            print(f'  Progress: {i+1}/{len(patient_ids)}')
 
 df = pd.DataFrame(results)
 
@@ -140,16 +140,16 @@ for region in ['GTVp', 'GTVn']:
     cols_to_zero += [f'{region}_SUVmean', f'{region}_SUVmax', f'{region}_TLG', f'{region}_count']
     cols_to_zero = [c for c in cols_to_zero if c in df.columns and c != empty_col]
     df.loc[empty_rows, cols_to_zero] = 0.0
-    print(f'{region}: {int(empty_rows.sum())} 个空mask患者, 已对 {len(cols_to_zero)} 个特征列填0')
+    print(f'{region}: {int(empty_rows.sum())} cases with empty mask, filled in zeros in {len(cols_to_zero)} features')
 
 errors = df[df.get('error').notna()] if 'error' in df.columns else pd.DataFrame()
 if len(errors) > 0:
-    print(f'[WARNING] {len(errors)} 个患者提取失败:')
+    print(f'[WARNING] Extraction failed in {len(errors)} patients:')
     print(errors[['PatientID','error']].to_string())
 
 remaining_nan = df.isna().sum().sum()
-print(f'[CHECK] 修复后剩余NaN总数(不含error列): {remaining_nan}')
+print(f'[CHECK] Total number of NaNs remaining after repair (excluding the error column): {remaining_nan}')
 
 df.to_csv(OUTPUT, index=False)
-print(f'[OK] 完成: {df.shape}')
-print(f'[OK] 保存到: {OUTPUT}')
+print(f'[OK] Finished: {df.shape}')
+print(f'[OK] Already saved at: {OUTPUT}')
