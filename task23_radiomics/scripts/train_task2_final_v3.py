@@ -25,7 +25,7 @@ for df in [df_train_full, df_chuv]:
     df['GTVp_TLG_pynorm'] = (df['PET_GTVp_shape_VoxelVolume'] * df['PET_GTVp_firstorder_Mean']).fillna(0)
     df['GTVn_TLG_pynorm'] = (df['PET_GTVn_shape_VoxelVolume'] * df['PET_GTVn_firstorder_Mean']).fillna(0)
 
-# 固定列顺序: sorted, 跟Task3保持同样的处理方式
+# Fixed column order: sorted, maintaining the same processing method as Task3.
 radio_cols = sorted([c for c in df_train_full.columns if c.startswith('CT_') or c.startswith('PET_')])
 shape_cols = sorted([c for c in radio_cols if 'shape' in c])
 clinical_cols = ['Age', 'Gender_enc', 'HPV_enc']
@@ -74,10 +74,10 @@ for model_name, target_col in [('t_stage', 'T_label'), ('n_stage', 'N_label')]:
     ba_avg = balanced_accuracy_score(y_test, pred_avg)
     cm = confusion_matrix(y_test, pred_avg, labels=classes)
 
-    print(f'{model_name}: 训练population={len(df)}, 特征数={len(feats)}')
-    print(f'  单种子范围: {min(ba_per_seed):.4f} ~ {max(ba_per_seed):.4f}')
-    print(f'  多种子概率平均后 Test BA = {ba_avg:.4f}  (更稳健的最终数字)')
-    print(f'  混淆矩阵 (行=真实,列=预测), 类别={list(classes)}:')
+    print(f'{model_name}: training population={len(df)}, feature number ={len(feats)}')
+    print(f'  Single seed range: {min(ba_per_seed):.4f} ~ {max(ba_per_seed):.4f}')
+    print(f'  After averaging the probabilities of multiple seeds Test BA = {ba_avg:.4f}  (A more robust final number or not?)')
+    print(f'  Confusion matrix (rows = true, columns = predicted), classes={list(classes)}:')
     print(cm)
     print()
 
@@ -85,5 +85,5 @@ for model_name, target_col in [('t_stage', 'T_label'), ('n_stage', 'N_label')]:
     joblib.dump(scaler, f'{RES_DIR}{model_name}_scaler_v2.joblib')
     with open(f'{RES_DIR}{model_name}_features_v2.json', 'w') as f:
         json.dump(feats, f)
-    print(f'  [OK] 已保存{len(SEEDS)}个种子的模型列表, 推理时对概率取平均后argmax')
+    print(f'  [OK] saved A list of models with {len(SEEDS)}seeds; during inference, the argmax is calculated by averaging the probabilities.')
     print()
