@@ -57,10 +57,7 @@ T_MAP = {0: "T1", 1: "T2", 2: "T3", 3: "T4", 4: "T4"}  # T0->T4 fallback
 N_MAP = {0: "N0", 1: "N1", 2: "N2", 3: "N3"}
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # Main
-# ═══════════════════════════════════════════════════════════════════════════
-
 def run():
     ct_path  = get_image_file(INPUT_PATH / "images/ct")
     pet_path = get_image_file(INPUT_PATH / "images/pet")
@@ -104,9 +101,7 @@ def run():
     return 0
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # Stage 1: STU-Net segmentation
-# ═══════════════════════════════════════════════════════════════════════════
 
 _SEG_PREDICTOR = None
 
@@ -197,9 +192,7 @@ def write_segmentation(location, seg_crop, reference_path):
     print(f"[seg] wrote output.mha  size={seg_orig.GetSize()}", flush=True)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # Stage 2: DenseNet — DL risk score only (for Task 3)
-# ═══════════════════════════════════════════════════════════════════════════
 
 _CLIN_CACHE = None
 
@@ -328,9 +321,7 @@ def run_dl_risk_BC(ct_crop, pet_crop, seg_crop, prob_t_crop, prob_n_crop, ehr):
     return risk_B, risk_C
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # Stage 3: PyRadiomics feature extraction
-# ═══════════════════════════════════════════════════════════════════════════
 
 def extract_radiomics(ct_path, pet_path, seg_crop):
     """Extract PyRadiomics features. Returns feature dict.
@@ -463,9 +454,7 @@ def _ehr_clinical(ehr):
     )
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # Stage 4: RF ensemble -> T/N staging (Task 2)
-# ═══════════════════════════════════════════════════════════════════════════
 
 def run_rf_staging(feat_dict, ehr, dl_t_proba, dl_n_proba):
     """RF+DL stacking (Option B): Logistic Regression on
@@ -522,9 +511,7 @@ def run_rf_staging(feat_dict, ehr, dl_t_proba, dl_n_proba):
     return t_stage, n_stage
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # Stage 5: Clinical RSF + Cox ensemble -> RFS (Task 3)
-# ═══════════════════════════════════════════════════════════════════════════
 
 def run_rfs(feat_dict, ehr, dl_risk_A, risk_B, risk_C):
     """Four-source rank-average fusion: A, B, C (DL) + RSF (radiomics).
@@ -566,9 +553,7 @@ def run_rfs(feat_dict, ehr, dl_risk_A, risk_B, risk_C):
     return -1.0 * fused
 
 
-# ═══════════════════════════════════════════════════════════════════════════
 # I/O utilities
-# ═══════════════════════════════════════════════════════════════════════════
 
 def get_image_file(location):
     files = (
