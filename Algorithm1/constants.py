@@ -7,7 +7,7 @@ the Grand Challenge container. Values here MUST match the training config, or
 the packaged weights will be applied to mismatched inputs.
 """
 
-# ─── Image resampling (must match training/config.py) ─────────────────────────
+# Image resampling (must match training/config.py)
 # preprocess_jin.py crops raw CT/PET to 200x200x310 @ 1 mm (X,Y,Z).
 # The multitask DenseNet then pads to PAD_TO_SHAPE and resamples 1 mm -> 2 mm.
 NATIVE_SPACING = (1.0, 1.0, 1.0)     # mm  (cropped nnUNet image spacing)
@@ -18,7 +18,7 @@ ROI_SIZE       = (100, 100, 155)     # DenseNet input spatial shape
 # preprocess_jin.py fixed crop box (X, Y, Z), centred on PET hot-spot
 CROP_BOX_SIZE  = (200, 200, 310)
 
-# ─── Label maps (must match training) ─────────────────────────────────────────
+# Label maps (must match training) 
 T_STAGE_MAP = {"T1": 0, "T2": 1, "T3": 2, "T4": 3}
 N_STAGE_MAP = {"N0": 0, "N1": 1, "N2": 2, "N3": 3}
 INV_T_STAGE = {v: k for k, v in T_STAGE_MAP.items()}
@@ -26,11 +26,11 @@ INV_N_STAGE = {v: k for k, v in N_STAGE_MAP.items()}
 N_T_CLASSES = 4
 N_N_CLASSES = 4
 
-# ─── Image channels for the chosen model: clinical + CT + PET + hard_T + hard_N
+# Image channels for the chosen model: clinical + CT + PET + hard_T + hard_N
 IMAGE_CHANNELS = ["CT", "PET", "hard_T", "hard_N"]   # in_channels = 4
 IN_CHANNELS    = len(IMAGE_CHANNELS)
 
-# ─── Clinical feature columns (must match utils.py) ───────────────────────────
+# Clinical feature columns (must match utils.py) 
 # Staging branch  (Task 2): Age, Gender, HPV_neg, HPV_unk           -> dim 4
 # RFS     branch  (Task 3): Age, Gender, HPV_neg, HPV_unk, Treatment -> dim 5
 STAGING_CLINICAL_COLS = ["Age", "Gender", "HPV_neg", "HPV_unk"]
