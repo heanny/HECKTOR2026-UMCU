@@ -14,15 +14,15 @@ for k,p in srcs.items():
 m=m.merge(rsf,on='PatientID',how='inner')
 m['center']=m['PatientID'].str.split('-').str[0]
 
-# 秩归一化在每个留出fold外单独做, 避免全局秩泄漏
+# Rank normalization is performed separately outside of each reserved fold to avoid global rank leakage.
 def eval_scheme(cols):
-    """逐中心: 秩在'其余中心'上fit再map到留出中心, 收集全局oof risk"""
+    """Center-by-center: Rank is fitted to the remaining centers and then mapped to the leftover centers to collect global out-of-risk. """
     oof=np.full(len(m),np.nan)
     for held in m['center'].unique():
         tr=m['center']!=held; te=m['center']==held
         risk=np.zeros(te.sum())
         for c in cols:
-            # 用训练中心的分布把留出中心的值转成分位
+            # The value left out of the center is converted into a fraction using the distribution of the training center.
             ref=m.loc[tr,c].values
             val=m.loc[te,c].values
             q=np.searchsorted(np.sort(ref),val)/len(ref)
