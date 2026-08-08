@@ -13,7 +13,11 @@ with attribution.
 
 ## Changes made relative to the original MEDAI solution
 - We use a **5-fold ensemble** (the original MEDAI solution used a 10-fold ensemble).
-- We conducted additional experiments to further improve segmentation.
+- We conducted the background class decomposition (Saluja, Rachit, et al.) experiments on top of the 5-fold ensembled STU-Net-Small architecture.
+ to further improve segmentation.
+
+### References
+- Background class decomposition: Saluja, Rachit, et al. "BackSplit: The Importance of Sub-dividing the Background in Biomedical Lesion Segmentation." Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition. 2026.
 
 ## Citation
 Please cite the MEDAI HECKTOR 2025 work when using or building on this
@@ -27,7 +31,7 @@ segmentation model:
 }
 ```
 
-## Additional references
+## Additional references 
 - STU-Net architecture: Huang et al., "STU-Net: Scalable and Transferable
   Medical Image Segmentation Models Empowered by Large-Scale Supervised
   Pre-training", 2023. https://github.com/uni-medical/STU-Net
@@ -35,9 +39,9 @@ segmentation model:
   for deep learning-based biomedical image segmentation", Nature Methods, 2021).
 
 ## Our contribution
-We trained STU-Net-Small (5-fold ensemble) on HECKTOR 2026 data. The trained
-weights are provided in `weights/` (or via an external link). The training
-configuration is in `plans.json` and `dataset.json`.
+We trained STU-Net-Small (5-fold ensemble) on HECKTOR 2026 data. The training
+configuration is in `plans.json` and `dataset.json`. We also experimented the background class decomposition (Saluja, Rachit, et al.) on top of the 5-fold ensembled STU-Net-Small architecture.
+
 
 ## To reproduce
 1. Install STU-Net from the original repository (link above).
