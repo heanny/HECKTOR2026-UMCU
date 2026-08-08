@@ -17,14 +17,10 @@ m=m.merge(rsf,on='PatientID',how='inner')
 print(f"aligned n={len(m)}")
 
 cols=['A','B','C','RSF']
-print("\nSpearman 相关矩阵 (最终成员):")
+print("\nSpearman correlation matrix (final members):")
 print(m[cols].corr(method='spearman').round(3))
 
 e=m['Relapse'].astype(bool); t=m['RFS']
-print("\n各成员单独 OOF C-index:")
+print("\nEach member's individual OOF C-index:")
 for c in cols:
     print(f"  {c:4s}: {concordance_index_censored(e,t,m[c])[0]:.4f}")
-
-print("\n>>> 关键判断:")
-print(">>> RSF 与哪个 DL 相关最低? 越低=越独立=越值得纳入(即使RSF较弱)")
-print(">>> 若 RSF 与某DL相关 <0.3, 说明radiomics捕捉了该DL忽略的独立信号")
