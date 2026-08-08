@@ -25,8 +25,8 @@ def make_y(d):
 
 y_train = make_y(df)
 
-# ── 1. Clinical RSF (CT+PET + Age/Gender/HPV) ──────────────────────
-print('\n[1/4] 训练 Clinical RSF (CT+PET+Clinical, 433特征)...')
+# 1. Clinical RSF (CT+PET + Age/Gender/HPV) 
+print('\n[1/4] training Clinical RSF (CT+PET+Clinical, 433 features)...')
 radio_cols = sorted([c for c in df.columns if c.startswith('CT_') or c.startswith('PET_')])
 clinical_cols = ['Age', 'Gender_enc', 'HPV_enc']
 clinical_rfs_feats = radio_cols + clinical_cols
@@ -49,10 +49,10 @@ joblib.dump(models_rfs,  f'{RES_DIR}clinical_rfs_model_v2_ensemble.joblib')
 joblib.dump(scaler_rfs,  f'{RES_DIR}clinical_rfs_scaler_v2.joblib')
 with open(f'{RES_DIR}clinical_rfs_features_v2.json', 'w') as f:
     json.dump(clinical_rfs_feats, f)
-print(f'[OK] Clinical RSF 已保存 ({len(clinical_rfs_feats)} features)')
+print(f'[OK] Clinical RSF is saved ({len(clinical_rfs_feats)} features)')
 
-# ── 2. OOF risk scores (LOCO CV) for Cox ensemble training ─────────
-print('\n[2/4] 生成 Clinical RSF OOF risk scores (LOCO CV)...')
+# 2. OOF risk scores (LOCO CV) for Cox ensemble training 
+print('\n[2/4] Calculate Clinical RSF OOF risk scores (LOCO CV)...')
 from sklearn.preprocessing import StandardScaler as SS
 df_labels_full = pd.read_csv(f'{FEAT_DIR}train_dataset.csv')[['PatientID', 'CenterID']]
 df = df.merge(df_labels_full, on='PatientID', how='left')
@@ -86,10 +86,10 @@ oof_clinical_rfs = pd.DataFrame({
     'RFS':        df['RFS'].values,
 })
 oof_clinical_rfs.to_csv(f'{FEAT_DIR}oof_clinical_rfs_v2.csv', index=False)
-print(f'[OK] OOF risk scores 已保存: oof_clinical_rfs_v2.csv')
+print(f'[OK] OOF risk scores is saved: oof_clinical_rfs_v2.csv')
 
-# ── 3. Docker 1: Cox ensemble (multitask/CT+PET+hTN, alpha=0.001) ──
-print('\n[3/4] 训练 Docker 1 Cox ensemble (multitask/CT+PET+hTN, α=0.001)...')
+# 3. Docker 1: Cox ensemble (multitask/CT+PET+hTN, alpha=0.001) 
+print('\n[3/4] Train: Docker 1 Cox ensemble (multitask/CT+PET+hTN, alpha=0.1)...')
 dl_cfg1  = 'multitask/CT+PET+prob_T+prob_N+hard_T+hard_N'
 dl_oof1  = pd.read_csv(f'{PRED_DIR}{dl_cfg1}/oof_predictions.csv').rename(
              columns={'risk_score': 'dl_risk'})
@@ -97,7 +97,7 @@ dl_oof1  = pd.read_csv(f'{PRED_DIR}{dl_cfg1}/oof_predictions.csv').rename(
 mr1 = oof_clinical_rfs.merge(dl_oof1[['PatientID', 'dl_risk']], on='PatientID', how='inner')
 mr1 = mr1.dropna(subset=['Relapse', 'RFS', 'dl_risk']).copy()
 yr1 = make_y(mr1)
-print(f'  训练集交集: {len(mr1)} 人')
+print(f'  Training set (intersection) has: {len(mr1)} cases')
 
 mms1 = MinMaxScaler()
 Xr1  = mms1.fit_transform(mr1[['rf_rfs_risk', 'dl_risk']].values)
@@ -110,10 +110,10 @@ joblib.dump(mms1, f'{RES_DIR}cox_minmax_docker1.joblib')
 with open(f'{RES_DIR}cox_docker1_info.json', 'w') as f:
     json.dump({'dl_config': dl_cfg1, 'alpha': 0.1,
                'coef_rf': cox1.coef_[0], 'coef_dl': cox1.coef_[1]}, f)
-print('[OK] Docker 1 Cox ensemble 已保存')
+print('[OK] Docker 1 Cox ensemble is saved')
 
-# ── 4. Docker 2: Cox ensemble (multitask/Clin+CT+PET+hTN, alpha=1.0) ─
-print('\n[4/4] 训练 Docker 2 Cox ensemble (multitask/Clin+CT+PET+hTN, α=1.0)...')
+# 4. Docker 2: Cox ensemble (multitask/Clin+CT+PET+hTN, alpha=1.0) 
+print('\n[4/4] Train Docker 2 Cox ensemble (multitask/Clin+CT+PET+hTN, alpha=1.0)...')
 dl_cfg2  = 'multitask/clinical+CT+PET+prob_T+prob_N+hard_T+hard_N'
 dl_oof2  = pd.read_csv(f'{PRED_DIR}{dl_cfg2}/oof_predictions.csv').rename(
              columns={'risk_score': 'dl_risk'})
@@ -121,7 +121,7 @@ dl_oof2  = pd.read_csv(f'{PRED_DIR}{dl_cfg2}/oof_predictions.csv').rename(
 mr2 = oof_clinical_rfs.merge(dl_oof2[['PatientID', 'dl_risk']], on='PatientID', how='inner')
 mr2 = mr2.dropna(subset=['Relapse', 'RFS', 'dl_risk']).copy()
 yr2 = make_y(mr2)
-print(f'  训练集交集: {len(mr2)} 人')
+print(f'  Training set (intersection) has: {len(mr2)} cases')
 
 mms2 = MinMaxScaler()
 Xr2  = mms2.fit_transform(mr2[['rf_rfs_risk', 'dl_risk']].values)
@@ -134,7 +134,7 @@ joblib.dump(mms2, f'{RES_DIR}cox_minmax_docker2.joblib')
 with open(f'{RES_DIR}cox_docker2_info.json', 'w') as f:
     json.dump({'dl_config': dl_cfg2, 'alpha': 1.0,
                'coef_rf': cox2.coef_[0], 'coef_dl': cox2.coef_[1]}, f)
-print('[OK] Docker 2 Cox ensemble 已保存')
+print('[OK] Docker 2 Cox ensemble is saved')
 
 print('\n=== 全部完成，保存的文件列表 ===')
 files = [
