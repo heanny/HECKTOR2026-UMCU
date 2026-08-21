@@ -2,11 +2,9 @@
 ![License](https://img.shields.io/badge/license-CC%20BY--NC%204.0-lightgrey)
 ![nnU-Net](https://img.shields.io/badge/nnU--Net-2.1-orange)
 
-# HECKTOR 2026 - Team UMCU
+# HECKTOR 2026 - Team UMCU 
 
-<!---
-Top-2 Solution (validation leaderboard) for Multitask Head and Neck Cancer Tumor Analysis
----->
+Top-2 validation leaderboard solution for Multitask Head and Neck Cancer Tumor Analysis
 
 This repository contains our solutions for the three tasks of the HECKTOR 2026 Challenge.
 
