@@ -4,9 +4,7 @@
 
 # HECKTOR 2026 - Team UMCU 
 
-Top-2 validation leaderboard solution for Multitask Head and Neck Cancer Tumor Analysis
-
-This repository contains our solutions for the three tasks of the HECKTOR 2026 Challenge.
+Top-2 validation leaderboard solution for Multitask Head and Neck Cancer Tumor Analysis. This repository contains our solutions for the three tasks of the HECKTOR 2026 Challenge.
 
 Multimodal PET/CT pipeline for the [HECKTOR 2026 challenge](https://hecktor26.grand-challenge.org/): tumor segmentation
 (Task 1), TN staging (Task 2), and prognosis (Task 3).
